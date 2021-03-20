@@ -4,8 +4,7 @@ SceneInfo *RSDK_sceneInfo = NULL;
 #if RETRO_USE_PLUS
 char *RSDK_name   = NULL;
 SKUInfo *RSDK_sku = NULL;
-#endif
-#if !RETRO_USE_PLUS
+#else
 EngineInfo *RSDK_info;
 #endif
 ControllerState *RSDK_controller = NULL;

@@ -85,35 +85,11 @@ typedef struct {
     byte active;
 
 #if RETRO_USE_PLUS
-#define RSDK_ENTITY                                                                                                                                  \
-    Vector2 position;                                                                                                                                \
-    Vector2 scale;                                                                                                                                   \
-    Vector2 velocity;                                                                                                                                \
-    Vector2 updateRange;                                                                                                                             \
-    int angle;                                                                                                                                       \
-    int alpha;                                                                                                                                       \
-    int rotation;                                                                                                                                    \
-    int groundVel;                                                                                                                                   \
-    int depth;                                                                                                                                       \
-    ushort group;                                                                                                                                    \
-    ushort objectID;                                                                                                                                 \
-    bool32 inBounds;                                                                                                                                 \
-    int field_3C;                                                                                                                                    \
-    bool32 tileCollisions;                                                                                                                           \
-    bool32 interaction;                                                                                                                              \
-    bool32 onGround;                                                                                                                                 \
-    byte active;                                                                                                                                     \
-    byte filter;                                                                                                                                     \
-    byte direction;                                                                                                                                  \
-    byte drawOrder;                                                                                                                                  \
-    byte collisionLayers;                                                                                                                            \
-    byte collisionPlane;                                                                                                                             \
-    byte collisionMode;                                                                                                                              \
-    byte drawFX;                                                                                                                                     \
-    byte inkEffect;                                                                                                                                  \
-    byte visible;                                                                                                                                    \
-    byte activeScreens;
+#define RSDK_ENTITY_FILTER byte filter;
 #else
+#define RSDK_ENTITY_FILTER
+#endif
+
 #define RSDK_ENTITY                                                                                                                                  \
     Vector2 position;                                                                                                                                \
     Vector2 scale;                                                                                                                                   \
@@ -132,6 +108,7 @@ typedef struct {
     bool32 interaction;                                                                                                                              \
     bool32 onGround;                                                                                                                                 \
     byte active;                                                                                                                                     \
+    RSDK_ENTITY_FILTER                                                                                                                               \
     byte direction;                                                                                                                                  \
     byte drawOrder;                                                                                                                                  \
     byte collisionLayers;                                                                                                                            \
@@ -141,7 +118,6 @@ typedef struct {
     byte inkEffect;                                                                                                                                  \
     byte visible;                                                                                                                                    \
     byte activeScreens;
-#endif
 
 #define ENTITY_SIZE (sizeof(Entity) + 0x400)
 
@@ -576,8 +552,7 @@ typedef struct {
     void *userdataPtrs;
     char *gameName;
     SKUInfo *currentSKU;
-#endif
-#if !RETRO_USE_PLUS
+#else
     EngineInfo *engineInfo;
 #endif
     SceneInfo *sceneInfo;
@@ -1069,8 +1044,7 @@ typedef struct {
 #if RETRO_USE_PLUS
     void (*ClearDebugValues)(void);
     void (*SetDebugValue)(const char *name, void *valPtr, int type, int unknown1, int unknown2);
-#endif
-#if !RETRO_USE_PLUS
+#else
     void (*PrintMessage)(void *message, byte type);
 #endif
 } RSDKFunctionTable;
