@@ -29,6 +29,9 @@ RSDKFunctionTable RSDK;
 
 Hitbox defaultHitbox;
 
+GameObject objectList[0x400];
+int objectListCount = 0;
+
 GameOptions *options;
 
 // This manages RSDKv5/Mania link, so it doesn't need to be edited
@@ -73,6 +76,14 @@ void InitLinkAPI(GameInfo *info)
     defaultHitbox.top    = -20;
     defaultHitbox.right  = 10;
     defaultHitbox.bottom = 20;
+
+    memset(objectList, 0, 0x400 * sizeof(GameObject));
+    objectListCount = 0;
+
+    //store this pointer for use later
+    CreateObject_Ptr  = RSDK.CreateObject;
+    //redirect all objects to forcefully use our pointer instead
+    RSDK.CreateObject = CreateObject_Private;
 }
 
 // ================

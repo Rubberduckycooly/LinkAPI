@@ -5,6 +5,9 @@
 // ignore this if you dont know what you're doing
 #define RETRO_USE_PLUS (1)
 
+#define true 1
+#define false 0
+
 #include "GameLink.h"
 
 #ifdef _MSC_VER
@@ -13,7 +16,7 @@
 #define DLLExport
 #endif
 
-#define RSDK_EDITABLE_VAR(object, type, var) RSDK.SetEditableVar(type, #var, object->objectID, offsetof(Entity##object, var))
+#define RSDK_EDITABLE_VAR(object, type, var) RSDK.SetEditableVar(type, #var, (byte)object->objectID, offsetof(Entity##object, var))
 
 #define RSDK_ADD_OBJECT(object)                                                                                                                      \
     RSDK.CreateObject((Object **)&object, #object, sizeof(Entity##object), sizeof(Object##object), ##object##_Update, ##object##_LateUpdate,         \
