@@ -23,15 +23,35 @@ typedef uint colour;
 typedef uint color;
 
 // dont change these, its just easier to read this way
-#define SCREEN_XMAX     (1280)
-#define SCREEN_YSIZE    (240)
+
+#define SCREEN_XMAX    (1280)
+#define SCREEN_YSIZE   (240)
+#define SCREEN_YCENTER (SCREEN_YSIZE / 2)
+
 #define LAYER_COUNT     (8)
 #define DRAWLAYER_COUNT (16)
+
 #if RETRO_USE_PLUS
 #define PLAYER_MAX (4)
+#define SCREEN_MAX (4)
 #else
 #define PLAYER_MAX (2)
+#define SCREEN_MAX (2)
 #endif
+
+#define CAMERA_MAX (4)
+
+// 0x800 scene objects, 0x40 reserved ones, and 0x100 spare slots for creation
+#define RESERVE_ENTITY_COUNT (0x40)
+#define TEMPENTITY_COUNT     (0x100)
+#define SCENEENTITY_COUNT    (0x800)
+#define ENTITY_COUNT         (RESERVE_ENTITY_COUNT + SCENEENTITY_COUNT + TEMPENTITY_COUNT)
+#define TEMPENTITY_START     (ENTITY_COUNT - TEMPENTITY_COUNT)
+
+#define TYPE_COUNT      (0x100)
+#define TYPEGROUP_COUNT (0x104)
+
+#define CHANNEL_COUNT (0x10)
 
 // =======================================
 // Game Structs
@@ -53,8 +73,7 @@ typedef struct {
     int depth;
     ushort group;
     ushort objectID;
-    bool32 inBounds;
-    int field_3C;
+    bool32 isPermanent;
     bool32 tileCollisions;
     bool32 interaction;
     bool32 onGround;
@@ -71,13 +90,11 @@ typedef struct {
     byte inkEffect;
     byte visible;
     byte activeScreens;
-    byte field_57;
 } Entity;
 
 typedef struct {
     ushort objectID;
     byte active;
-    byte field_3;
 } Object;
 
 #define RSDK_OBJECT                                                                                                                                  \
@@ -103,7 +120,7 @@ typedef struct {
     ushort group;                                                                                                                                    \
     ushort objectID;                                                                                                                                 \
     bool32 inBounds;                                                                                                                                 \
-    int field_3C;                                                                                                                                    \
+    bool32 isPermanent;                                                                                                                              \
     bool32 tileCollisions;                                                                                                                           \
     bool32 interaction;                                                                                                                              \
     bool32 onGround;                                                                                                                                 \
@@ -128,7 +145,6 @@ typedef struct {
     int region;
 } SKUInfo;
 
-// Unfinished
 typedef struct {
     int field_0;
     int field_4;
@@ -142,319 +158,19 @@ typedef struct {
     int field_24;
     int field_28;
     int field_2C;
-    byte field_30;
 } UnknownInfo;
-#else
-// Unfinished
+#endif
+
 typedef struct {
-    char gameName[32];
-    char gameSubname[32];
-    char version[16];
-    char field_50;
-    char field_51;
-    char field_52;
-    ushort objectCount;
-    char field_55;
-    char field_56;
-    char field_57;
-    char field_58;
-    char field_59;
-    char field_5A;
-    char field_5B;
-    char field_5C;
-    char field_5D;
-    char field_5E;
-    char field_5F;
-    char field_60;
-    char field_61;
-    char field_62;
-    char field_63;
-    char field_64;
-    char field_65;
-    char field_66;
-    char field_67;
-    char field_68;
-    char field_69;
-    char field_6A;
-    char field_6B;
-    char field_6C;
-    char field_6D;
-    char field_6E;
-    char field_6F;
-    char field_70;
-    char field_71;
-    char field_72;
-    char field_73;
-    char field_74;
-    char field_75;
-    char field_76;
-    char field_77;
-    char field_78;
-    char field_79;
-    char field_7A;
-    char field_7B;
-    char field_7C;
-    char field_7D;
-    char field_7E;
-    char field_7F;
-    char field_80;
-    char field_81;
-    char field_82;
-    char field_83;
-    char field_84;
-    char field_85;
-    char field_86;
-    char field_87;
-    char field_88;
-    char field_89;
-    char field_8A;
-    char field_8B;
-    char field_8C;
-    char field_8D;
-    char field_8E;
-    char field_8F;
-    char field_90;
-    char field_91;
-    char field_92;
-    char field_93;
-    char field_94;
-    char field_95;
-    char field_96;
-    char field_97;
-    char field_98;
-    char field_99;
-    char field_9A;
-    char field_9B;
-    char field_9C;
-    char field_9D;
-    char field_9E;
-    char field_9F;
-    char field_A0;
-    char field_A1;
-    char field_A2;
-    char field_A3;
-    char field_A4;
-    char field_A5;
-    char field_A6;
-    char field_A7;
-    char field_A8;
-    char field_A9;
-    char field_AA;
-    char field_AB;
-    char field_AC;
-    char field_AD;
-    char field_AE;
-    char field_AF;
-    char field_B0;
-    char field_B1;
-    char field_B2;
-    char field_B3;
-    char field_B4;
-    char field_B5;
-    char field_B6;
-    char field_B7;
-    char field_B8;
-    char field_B9;
-    char field_BA;
-    char field_BB;
-    char field_BC;
-    char field_BD;
-    char field_BE;
-    char field_BF;
-    char field_C0;
-    char field_C1;
-    char field_C2;
-    char field_C3;
-    char field_C4;
-    char field_C5;
-    char field_C6;
-    char field_C7;
-    char field_C8;
-    char field_C9;
-    char field_CA;
-    char field_CB;
-    char field_CC;
-    char field_CD;
-    char field_CE;
-    char field_CF;
-    char field_D0;
-    char field_D1;
-    char field_D2;
-    char field_D3;
-    char field_D4;
-    char field_D5;
-    char field_D6;
-    char field_D7;
-    char field_D8;
-    char field_D9;
-    char field_DA;
-    char field_DB;
-    char field_DC;
-    char field_DD;
-    char field_DE;
-    char field_DF;
-    char field_E0;
-    char field_E1;
-    char field_E2;
-    char field_E3;
-    char field_E4;
-    char field_E5;
-    char field_E6;
-    char field_E7;
-    char field_E8;
-    char field_E9;
-    char field_EA;
-    char field_EB;
-    char field_EC;
-    char field_ED;
-    char field_EE;
-    char field_EF;
-    char field_F0;
-    char field_F1;
-    char field_F2;
-    char field_F3;
-    char field_F4;
-    char field_F5;
-    char field_F6;
-    char field_F7;
-    char field_F8;
-    char field_F9;
-    char field_FA;
-    char field_FB;
-    char field_FC;
-    char field_FD;
-    char field_FE;
-    char field_FF;
-    char field_100;
-    char field_101;
-    char field_102;
-    char field_103;
-    char field_104;
-    char field_105;
-    char field_106;
-    char field_107;
-    char field_108;
-    char field_109;
-    char field_10A;
-    char field_10B;
-    char field_10C;
-    char field_10D;
-    char field_10E;
-    char field_10F;
-    char field_110;
-    char field_111;
-    char field_112;
-    char field_113;
-    char field_114;
-    char field_115;
-    char field_116;
-    char field_117;
-    char field_118;
-    char field_119;
-    char field_11A;
-    char field_11B;
-    char field_11C;
-    char field_11D;
-    char field_11E;
-    char field_11F;
-    char field_120;
-    char field_121;
-    char field_122;
-    char field_123;
-    char field_124;
-    char field_125;
-    char field_126;
-    char field_127;
-    char field_128;
-    char field_129;
-    char field_12A;
-    char field_12B;
-    char field_12C;
-    char field_12D;
-    char field_12E;
-    char field_12F;
-    char field_130;
-    char field_131;
-    char field_132;
-    char field_133;
-    char field_134;
-    char field_135;
-    char field_136;
-    char field_137;
-    char field_138;
-    char field_139;
-    char field_13A;
-    char field_13B;
-    char field_13C;
-    char field_13D;
-    char field_13E;
-    char field_13F;
-    char field_140;
-    char field_141;
-    char field_142;
-    char field_143;
-    char field_144;
-    char field_145;
-    char field_146;
-    char field_147;
-    char field_148;
-    char field_149;
-    char field_14A;
-    char field_14B;
-    char field_14C;
-    char field_14D;
-    char field_14E;
-    char field_14F;
-    byte platformID;
+    char engineInfo[0x40];
+    char gameSubname[0x100];
+    char version[0x10];
+#if !RETRO_USE_PLUS
+    byte platform;
     byte language;
     byte region;
-    char field_153;
-    char field_154;
-    char field_155;
-    char field_156;
-    char field_157;
-    char field_158;
-    char field_159;
-    char field_15A;
-    char field_15B;
-    char field_15C;
-    char field_15D;
-    char field_15E;
-    char field_15F;
-    char field_160;
-    char field_161;
-    char field_162;
-    char field_163;
-    char field_164;
-    char field_165;
-    char field_166;
-    char field_167;
-    char field_168;
-    char field_169;
-    char field_16A;
-    char field_16B;
-    char field_16C;
-    char field_16D;
-    char field_16E;
-    char field_16F;
-    char field_170;
-    char field_171;
-    char field_172;
-    char field_173;
-    char field_174;
-    char field_175;
-    char field_176;
-    char field_177;
-    char field_178;
-    char field_179;
-    char field_17A;
-    char field_17B;
-    char field_17C;
-    char field_17D;
-    char field_17E;
-    char field_17F;
-} EngineInfo;
 #endif
+} EngineInfo;
 
 typedef struct {
     Entity *entity;
@@ -550,11 +266,9 @@ typedef struct {
     void *functionPtrs;
 #if RETRO_USE_PLUS
     void *userdataPtrs;
-    char *gameName;
     SKUInfo *currentSKU;
-#else
-    EngineInfo *engineInfo;
 #endif
+    EngineInfo *engineInfo;
     SceneInfo *sceneInfo;
     ControllerState *controller;
     AnalogState *stickL;
@@ -612,7 +326,7 @@ typedef struct {
     short frameCount;
     byte loopIndex;
     byte rotationFlag;
-} AnimationData;
+} Animator;
 
 typedef struct {
     int unknown;
@@ -650,7 +364,11 @@ typedef struct {
     byte *lineScroll;
 } TileLayer;
 
-extern char textBuffer[0x400];
+typedef struct {
+    byte statID;
+    const char *name;
+    void *data[64];
+} StatInfo;
 
 typedef enum {
     PLATFORM_PC     = 0,
@@ -680,6 +398,18 @@ typedef enum {
 typedef enum { FX_NONE = 0, FX_FLIP = 1, FX_ROTATE = 2, FX_SCALE = 4 } DrawFX;
 
 typedef enum { FLIP_NONE, FLIP_X, FLIP_Y, FLIP_XY } FlipFlags;
+
+typedef enum { TYPE_BLANK } DefaultObjTypes;
+
+typedef enum {
+    CONT_UNASSIGNED = -2,
+    CONT_AUTOASSIGN = -1,
+    CONT_ANY        = 0,
+    CONT_P1         = 1,
+    CONT_P2         = 2,
+    CONT_P3         = 3,
+    CONT_P4         = 4,
+} ControllerIDs;
 
 typedef enum {
     ALIGN_LEFT,
@@ -718,6 +448,7 @@ typedef enum {
     ACTIVE_XBOUNDS,
     ACTIVE_YBOUNDS,
     ACTIVE_RBOUNDS,
+    ACTIVE_NEVER2 = 0xFF,
 } ActiveFlags;
 
 typedef enum {
@@ -733,6 +464,64 @@ typedef enum {
     CMODE_ROOF,
     CMODE_RWALL,
 } CModes;
+
+typedef enum {
+    S3D_FLATCLR_WIREFRAME               = 0x0,
+    S3D_FLATCLR                         = 0x1,
+    S3D_UNKNOWN_2                       = 0x2,
+    S3D_UNKNOWN_3                       = 0x3,
+    S3D_FLATCLR_SHADED_WIREFRAME        = 0x4,
+    S3D_FLATCLR_SHADED                  = 0x5,
+    S3D_FLATCLR_SHADED_BLENDED          = 0x6,
+    S3D_FLATCLR_SCREEN_WIREFRAME        = 0x7,
+    S3D_FLATCLR_SCREEN                  = 0x8,
+    S3D_FLATCLR_SHADED_SCREEN_WIREFRAME = 0x9,
+    S3D_FLATCLR_SHADED_SCREEN           = 0xA,
+    S3D_FLATCLR_SHADED_BLENDED_SCREEN   = 0xB,
+} Scene3DDrawTypes;
+
+typedef enum {
+    SETTINGS_WINDOWED,
+    SETTINGS_BORDERED,
+    SETTINGS_EXCLUSIVEFS,
+    SETTINGS_VSYNC,
+    SETTINGS_TRIPLEBUFFERED,
+    SETTINGS_WINDOW_WIDTH,
+    SETTINGS_WINDOW_HEIGHT,
+    SETTINGS_FSWIDTH,
+    SETTINGS_FSHEIGHT,
+    SETTINGS_REFRESHRATE,
+    SETTINGS_SHADERSUPPORT,
+    SETTINGS_SHADERID,
+    SETTINGS_SCREENCOUNT,
+#if RETRO_USE_PLUS
+    SETTINGS_DIMTIMER,
+#endif
+    SETTINGS_STREAMSENABLED,
+    SETTINGS_STREAM_VOL,
+    SETTINGS_SFX_VOL,
+    SETTINGS_LANGUAGE,
+    SETTINGS_STORE,
+    SETTINGS_RELOAD,
+    SETTINGS_CHANGED,
+    SETTINGS_WRITE,
+} SettingsValues;
+
+typedef enum {
+    GROUP_ALL     = 0,
+    GROUP_CUSTOM1 = TYPE_COUNT,
+    GROUP_CUSTOM2,
+    GROUP_CUSTOM3,
+    GROUP_CUSTOM4,
+} TypeGroups;
+
+typedef enum { STATUS_CONTINUE = 100, STATUS_OK = 200, STATUS_FORBIDDEN = 403, STATUS_NOTFOUND = 404, STATUS_ERROR = 500 } StatusCodes;
+
+typedef enum {
+    REGION_US,
+    REGION_JP,
+    REGION_EU,
+} GameRegions;
 
 typedef enum {
     LANGUAGE_EN,
@@ -769,80 +558,78 @@ typedef enum {
 // RSDK Function Tables
 // =======================================
 
-#define voidToInt(x) (size_t)(x)
-
 // Userdata Table
 typedef struct {
-    void (*Unknown1)(void);
+    int (*GetUserLanguage)(void);
     bool32 (*GetConfirmButtonFlip)(void);
-    void (*Unknown2)(void);
-    void (*Unknown3)(void);
-    void (*Unknown4)(int a1);
-    bool32 (*CheckDLC)(byte dlc);
-    void (*Unknown5)(int a1);
+    void (*ExitGame)(void);
+    void (*LaunchManual)(void);
+    void (*Unknown4)(byte inputID);
+    bool32 (*CheckDLC)(int dlc);
+    void (*ShowExtensionOverlay)(byte overlay);
     void (*UnlockAchievement)(const char *achName);
-    void (*Missing0)(void);
-    void (*Unknown6)(int a1);
-    void (*Unknown7)(void);
-    void (*Unknown8)(int a1, int a2);
-    void (*Unknown9)(int a1, int a2, int a3);
-    void (*Unknown10)(void);
+    void (*GetAchievementStatus)(void);
+    void (*SetAchievementStatus)(int a1);
+    void (*LeaderboardsUnknown4)(void);
+    void (*FetchLeaderboard)(int a1, int a2);
+    void (*TrackScore)(int a1, int a2, int a3);
+    void (*GetLeaderboardsUnknown)(void);
     void (*LeaderboardEntryCount)(void);
-    void (*Missing1)(void);
+    int (*GetLeaderboardUnknown2)(void);
     void (*Unknown12)(int a2, uint a3, int a4);
-    void (*Missing2)(void);
+    void (*LeaderboardsUnknown8)(void);
     void (*ReadLeaderboardEntry)(uint a1);
     void (*SetRichPresence)(int, TextInfo *text);
-    void (*Unknown14)(int a1);
-    void (*Missing3)(void);
-    void (*Unknown15)(int a1);
-    void (*Unknown16)(void);
+    void (*TryTrackStat)(StatInfo *stat);
+    int (*GetStatsStatus)(void);
+    void (*SetStatsStatus)(int a1);
+    void (*UserStorageUnknown8)(void);
     void (*TryAuth)(void);
-    void (*GetUserAuthStatus)(void);
+    int (*GetUserAuthStatus)(void);
     void (*GetUsername)(TextInfo *text);
     void (*TryInitStorage)(void);
-    void (*GetStorageStatus)(void);
-    void (*Unknown22)(void);
-    void (*Unknown23)(void);
-    void (*Unknown24)(void);
-    void (*Missing4)(void);
-    void (*Unknown25)(void);
-    void (*Unknown26)(void);
-    void (*Unknown27)(int a1);
-    bool32 (*Unknown28)(void);
-    void (*LoadUserFile)(const char *name, int *data, int size, void (*callback)(int status));
-    void (*SaveUserFile)(const char *name, int *data, int size, void (*callback)(int status), bool32 compress);
-    void (*DeleteUserFile)(const char *filename, void (*callback)(int status));
-    void (*InitUserDB)(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-    void (*LoadUserDB)(const char *filename, void (*callback)(int status));
-    void (*SaveUserDB)(ushort tableID, void (*callback)(int status));
+    int (*UserStorageStatusUnknown1)(void);
+    int (*UserStorageStatusUnknown2)(void);
+    void (*ClearUserStorageStatus)(void);
+    void (*SetUserStorageStatus)(void);
+    int (*UserStorageStatusUnknown3)(void);
+    int (*UserStorageStatusUnknown4)(void);
+    int (*UserStorageStatusUnknown5)(void);
+    void (*SetUserStorageNoSave)(bool32 state);
+    bool32 (*GetUserStorageNoSave)(void);
+    void (*LoadUserFile)(const char *name, int *data, int size, void (*callback)(int status));                  // load user file from game dir
+    void (*SaveUserFile)(const char *name, int *data, int size, void (*callback)(int status), bool32 compress); // save user file to game dir
+    void (*DeleteUserFile)(const char *filename, void (*callback)(int status));                                 // delete user file from game dir
+    ushort (*InitUserDB)(const char *name, ...);
+    ushort (*LoadUserDB)(const char *filename, int (*callback)(int status));
+    void (*SaveUserDB)(ushort tableID, int (*callback)(int status));
     void (*ClearUserDB)(ushort tableID);
     void (*ClearAllUserDBs)(void);
     void (*Unknown31)(ushort tableID);
-    void (*GetUserDBStatus)(ushort tableID);
-    void (*Unknown33)(ushort tableID, int a2, int a3, int a4);
-    void (*Unknown34)(ushort tableID, int a2, int a3, int a4);
-    void (*Unknown35)(ushort tableID);
-    int (*GetUserDBUnkownCount)(ushort tableID, ushort entryID);
-    int (*GetUserDBUnkown)(ushort tableID);
-    void (*AddUserDBEntry)(ushort tableID, void *, void *, void *, void *);
-    void (*Unknown39)(ushort tableID, int a2, int a3, int a4, void *dst);
-    void (*GetEntryUUID)(ushort tableID, ushort entryID);
-    void (*Unknown40)(ushort tableID, ushort entryID);
-    void (*GetUserDBTimeA)(ushort tableID, int a2, char *buf, uint sizeInBytes, const char *format);
-    void (*Unknown42)(ushort tableID, int a2);
-    void (*Unknown43)(ushort tableID);
+    int (*GetUserDBStatus)(ushort tableID);
+    void (*Unknown33)(ushort tableID, int a2, const char *name, void *value);
+    void (*Unknown34)(ushort tableID, int a2, const char *name, void *value);
+    int (*GetUserDBUnknownCount)(ushort tableID);
+    int (*GetUserDBUnknown)(ushort tableID, ushort entryID);
+    int (*AddUserDBEntry)(ushort tableID);
+    void (*SetUserDBValue)(ushort tableID, int a2, int a3, const char *name, void *value);
+    void (*Unknown39)(ushort tableID, int a2, int a3, const char *name, void *value);
+    uint (*GetUserDBEntryUUID)(ushort tableID, ushort entryID);
+    void (*GetUserDBByID)(ushort tableID, uint uuid);
+    void (*GetUserDBCreationTime)(ushort tableID, ushort entry, char *buf, uint sizeInBytes, const char *format);
+    void (*RemoveDBEntry)(ushort tableID, ushort entry);
+    void (*RemoveAllDBEntries)(ushort tableID);
     // count: 59
 } UserFunctionTable;
 
 // Function Table
 typedef struct {
-    void (*InitGameOptions)(void **options, int size);
-    void (*CreateObject)(Object **structPtr, const char *name, uint entitySize, uint objectSize, void (*update)(), void (*lateUpdate)(),
-                         void (*staticUpdate)(), void (*draw)(), void (*create)(void *), void (*stageLoad)(), void (*editorDraw)(),
-                         void (*editorLoad)(), void (*serialize)());
+    void (*InitGlobalVariables)(void **globals, int size);
+    void (*RegisterObject)(Object **structPtr, const char *name, uint entitySize, uint objectSize, void (*update)(void), void (*lateUpdate)(void),
+                           void (*staticUpdate)(void), void (*draw)(void), void (*create)(void *), void (*stageLoad)(void), void (*editorDraw)(void),
+                           void (*editorLoad)(void), void (*serialize)(void));
 #if RETRO_USE_PLUS
-    void (*CreateObjectContainer)(void **structPtr, const char *name, uint objectSize);
+    void (*RegisterObjectContainer)(void **structPtr, const char *name, uint objectSize);
 #endif
     bool32 (*GetActiveEntities)(ushort group, Entity **entity);
     bool32 (*GetEntities)(ushort type, Entity **entity);
@@ -860,19 +647,19 @@ typedef struct {
     bool32 (*CheckOnScreen)(void *entity, Vector2 *range);
     bool32 (*CheckPosOnScreen)(Vector2 *pos, Vector2 *range);
     void (*AddDrawListRef)(byte layer, ushort entityID);
-    void (*SwapDrawLayers)(byte layer, ushort entityID);
-    void (*SetDrawLayerProperties)(byte layer, bool32 active, void (*initDrawPtr)(void));
+    void (*SwapDrawListEntries)(byte layer, ushort entryStart, ushort entryEnd, ushort count);
+    void (*SetDrawLayerProperties)(byte layer, bool32 sorted, void (*callback)(void));
     void (*LoadScene)(const char *categoryName, const char *sceneName);
     void (*SetGameMode)(byte mode);
 #if RETRO_USE_PLUS
     void (*SetHardResetFlag)(bool32 set);
 #endif
-    void (*CheckValidScene)(void);
+    bool32 (*CheckValidScene)(void);
     int (*CheckStageFolder)(const char *folderName);
     int (*InitSceneLoad)(void);
     int (*GetObjectIDByName)(const char *name);
-    void (*ClearScreens)(void);
-    void (*AddScreen)(Vector2 *pos, int offsetX, int offsetY, bool32 worldRelative);
+    void (*ClearCameras)(void);
+    void (*AddCamera)(Vector2 *pos, int offsetX, int offsetY, bool32 worldRelative);
 #if !RETRO_USE_PLUS
     void *(*GetFuncPtr)(const char *funcName);
 #endif
@@ -914,15 +701,15 @@ typedef struct {
     void (*AppendString)(TextInfo *info, const char *str);
     void (*Unknown67)(TextInfo *, TextInfo *);
     void (*LoadStrings)(TextInfo *dst, const char *path, int);
-    void (*Unknown68)(TextInfo *, TextInfo *, int, int);
+    void (*SplitStringList)(TextInfo *list, TextInfo *strings, int start, int end);
     void (*GetCString)(char *text, TextInfo *info);
     void (*StringCompare)(TextInfo *strA, TextInfo *strB, bool32 flag);
-    void (*Unknown70)(void);
-    void (*Unknown71)(void);
-    int (*SetScreenSize)(void *, void *, void *, void *, void *);
+    void (*GetDisplayInfo)(int *displayID, int *width, int *height, int *refreshRate, TextInfo *text);
+    void (*GetWindowSize)(int *width, int *height);
+    int (*SetScreenSize)(byte screenID, ushort width, ushort height);
     void (*SetClipBounds)(byte screenID, int x1, int y1, int x2, int y2);
 #if RETRO_USE_PLUS
-    void (*SetScreenUnknown)(byte, byte, byte, byte, byte);
+    void (*SetScreenSplitVerticies)(sbyte p2_1, sbyte p2_2, sbyte p3_1, sbyte p3_2, sbyte p3_3);
 #endif
     short (*LoadSpriteSheet)(const char *path, Scopes scope);
     void (*SetLookupTable)(ushort *tablePtr);
@@ -944,37 +731,37 @@ typedef struct {
     void (*DrawCircle)(int x, int y, int radius, uint colour, int alpha, InkEffects inkEffect, bool32 screenRelative);
     void (*DrawCircleOutline)(int x, int y, int innerRadius, int outerRadius, uint colour, int alpha, InkEffects inkEffect, bool32 screenRelative);
     void (*DrawQuad)(Vector2 *verticies, int vertCount, int r, int g, int b, int alpha, InkEffects inkEffect);
-    void (*DrawBlendedQuad)(Vector2 *verticies, Vector2 *vertexUVs, int vertCount, int alpha, InkEffects inkEffect);
-    void (*DrawSprite)(AnimationData *data, Vector2 *position, bool32 screenRelative);
+    void (*DrawBlendedQuad)(Vector2 *verticies, colour *vertColours, int vertCount, int alpha, InkEffects inkEffect);
+    void (*DrawSprite)(Animator *data, Vector2 *position, bool32 screenRelative);
     void (*DrawDeformedSprite)(ushort sheet, InkEffects inkEffect, bool32 screenRelative);
-    void (*DrawText)(AnimationData *data, Vector2 *position, TextInfo *info, int endFrame, int textLength, FlipFlags direction, int a7, int a8,
-                     int a9, bool32 ScreenRelative);
+    void (*DrawText)(Animator *data, Vector2 *position, TextInfo *info, int endFrame, int textLength, Alignments align, int spacing, int a8,
+                     Vector2 *charPos, bool32 ScreenRelative);
     void (*DrawTile)(ushort *tileInfo, int countX, int countY, void *entityPtr, Vector2 *position, bool32 screenRelative);
     void (*CopyTile)(void);
     void (*DrawAniTiles)(ushort sheetID, ushort tileIndex, ushort srcX, ushort srcY, ushort width, ushort height);
-    void (*FillScreen)(int a1, int a2, int a3, int a4);
+    void (*FillScreen)(uint colour, int alphaR, int alphaG, int alphaB);
     ushort (*LoadMesh)(const char *filename, byte scope);
     ushort (*Create3DScene)(const char *identifier, ushort faceCount, byte scope);
     void (*Prepare3DScene)(ushort index);
-    void (*Set3DSceneAmbient)(ushort index, int x, int y, int z);
-    void (*Set3DSceneDiffuse)(ushort index, int x, int y, int z);
-    void (*Set3DSceneSpecular)(ushort index, int x, int y, int z);
+    void (*SetAmbientColour)(ushort index, int x, int y, int z);
+    void (*SetDiffuseColour)(ushort index, int x, int y, int z);
+    void (*SetSpecularColour)(ushort index, int x, int y, int z);
     void (*AddModelTo3DScene)(ushort modelIndex, ushort sceneIndex, byte type, Matrix *mat1, Matrix *mat2, colour colour);
-    void (*SetModelAnimation)(ushort modelAnim, AnimationData *data, short animSpeed, byte loopIndex, bool32 forceApply, ushort frameID);
-    void (*AddMeshFrameTo3DScene)(ushort modelID, ushort sceneID, AnimationData *data, byte drawMode, Matrix *mat1, Matrix *mat, colour colour);
+    void (*SetModelAnimation)(ushort modelAnim, Animator *data, short animSpeed, byte loopIndex, bool32 forceApply, ushort frameID);
+    void (*AddMeshFrameTo3DScene)(ushort modelID, ushort sceneID, Animator *data, byte drawMode, Matrix *mat1, Matrix *mat, colour colour);
     void (*Draw3DScene)(ushort index);
     ushort (*LoadSpriteAnimation)(const char *path, Scopes scope);
     ushort (*CreateSpriteAnimation)(const char *filename, uint frameCount, uint animCount, Scopes scope);
-    void (*SetSpriteAnimation)(ushort spriteIndex, ushort animationID, AnimationData *data, bool32 forceApply, ushort frameID);
-    void (*EditSpriteAnimation)(ushort spriteIndex, ushort animID, const char *name, int frameOffset, ushort frameCount, short animSpeed, byte loopIndex,
-                          byte rotationFlag);
+    void (*SetSpriteAnimation)(ushort spriteIndex, ushort animationID, Animator *data, bool32 forceApply, ushort frameID);
+    void (*EditSpriteAnimation)(ushort spriteIndex, ushort animID, const char *name, int frameOffset, ushort frameCount, short animSpeed,
+                                byte loopIndex, byte rotationFlag);
     void (*SetSpriteString)(ushort spriteIndex, ushort animID, TextInfo *info);
     void *(*GetSpriteAnimation)(ushort sprIndex, const char *name);
     SpriteFrame *(*GetFrame)(ushort sprIndex, ushort anim, int frame);
-    Hitbox *(*GetHitbox)(AnimationData *data, byte hitboxID);
-    short (*GetFrameID)(AnimationData *data);
+    Hitbox *(*GetHitbox)(Animator *data, byte hitboxID);
+    short (*GetFrameID)(Animator *data);
     int (*GetStringWidth)(ushort sprIndex, ushort animID, TextInfo *info, int startIndex, int length, int spacing);
-    void (*ProcessAnimation)(AnimationData *data);
+    void (*ProcessAnimation)(Animator *data);
     TileLayer *(*GetSceneLayer)(int layerID);
     int (*GetSceneLayerID)(const char *name);
     void (*GetLayerSize)(ushort layer, Vector2 *size, bool32 pixelSize);
@@ -992,34 +779,34 @@ typedef struct {
     bool32 (*ObjectTileGrip)(void *entity, ushort collisionLayers, byte collisionMode, byte collisionPlane, int xOffset, int yOffset,
                              sbyte tolerance);
     void (*ProcessTileCollisions)(void *entity, Hitbox *outer, Hitbox *inner);
-    void (*GetTileAngle)(ushort tileID, byte cPlane, byte cMode);
+    int (*GetTileAngle)(ushort tileID, byte cPlane, byte cMode);
     void (*SetTileAngle)(ushort tileID, byte cPlane, byte cMode, byte value);
-    void (*GetTileBehaviour)(ushort tileID, byte cPlane);
+    byte (*GetTileBehaviour)(ushort tileID, byte cPlane);
     void (*SetTileBehaviour)(ushort tileID, byte cPlane, byte value);
     int (*GetSFX)(const char *path);
     int (*PlaySFX)(ushort sfx, int loop, int pan);
     void (*StopSFX)(ushort sfx);
-    int (*PlayMusic)(const char *filename, uint slot, int a3, uint loopStart, bool32 loop);
-    int (*SetSoundAttributes)(byte a1, uint slot, float volume, float pan, float playbackSpeed);
-    void (*SoundUnknown1)(byte slot);
+    int (*PlayStream)(const char *filename, uint slot, int a3, uint loopPoint, bool32 loadASync);
+    int (*SetChannelAttributes)(byte slot, float volume, float pan, float playbackSpeed);
+    void (*StopChannel)(byte slot);
     void (*PauseChannel)(byte slot);
     void (*ResumeChannel)(byte slot);
-    bool32 (*SoundPlaying)(byte slot);
-    bool32 (*ChannelPlaying)(byte slot);
-    bool32 (*TrackPlaying)(byte slot);
-    void (*LoadVideo)(const char *filename, double a2, bool32 (*skipCallback)());
+    bool32 (*IsSFXPlaying)(byte slot);
+    bool32 (*ChannelActive)(byte slot);
+    int (*GetChannelPos)(byte slot);
+    void (*LoadVideo)(const char *filename, double a2, bool32 (*skipCallback)(void));
     bool32 (*LoadImage)(const char *filename, double displayLength, double speed, bool32 (*skipCallback)(void));
 #if RETRO_USE_PLUS
     int (*ControllerIDForInputID)(byte controllerID);
-    int (*MostRecentActiveControllerID)(int a1, int a2, uint a3);
-    void (*Unknown100)(int a1);
-    void (*Unknown101)(int a1);
-    void (*Missing21)(int a1);
-    void (*Missing22)(int a1, int a2, int a3);
-    void (*Missing23)(int a1, int a2, int a3);
-    void (*Missing24)(void);
-    void (*Missing25)(byte controllerID, int a2, int a3);
-    void (*Missing26)(byte controllerID, int a2, int a3);
+    int (*MostRecentActiveControllerID)(int inputID, int a2, uint a3);
+    int (*Unknown100)(int inputID);
+    int (*GetAssignedControllerID)(int inputID);
+    int (*GetAssignedUnknown)(int inputID);
+    int (*DoInputUnknown2)(int inputID, int a2, int a3);
+    int (*DoInputUnknown3)(int inputID, int a2, int a3);
+    int (*Missing24)(void);
+    int (*DoInputUnknown2_Active)(byte controllerID, int a2, int a3);
+    int (*DoInputUnknown3_Active)(byte controllerID, int a2, int a3);
     void (*AssignControllerID)(byte controllerID, int a2);
     bool32 (*InputIDIsDisconnected)(byte controllerID);
     void (*ResetControllerAssignments)(void);
@@ -1027,24 +814,25 @@ typedef struct {
 #if !RETRO_USE_PLUS
     void (*Unknown92)(int a1, int a2, int *a3);
 #endif
-    void (*LoadUserFile)(const char *filename, void *buffer, uint size); // load user file from exe dir
-    void (*SaveUserFile)(const char *fileName, void *buffer, uint size); // save use file to exe dir
+    int (*LoadUserFile)(const char *filename, void *buffer, uint size); // load user file from exe dir
+    int (*SaveUserFile)(const char *fileName, void *buffer, uint size); // save use file to exe dir
 #if RETRO_USE_PLUS
     void (*PrintLog)(SeverityModes severity, const char *message, ...);
     void (*PrintString)(SeverityModes severity, const char *message);
-    void (*PrintText)(SeverityModes severity, const char *message, TextInfo *text);
+    void (*PrintText)(SeverityModes severity, TextInfo *text);
     void (*PrintIntegerUnsigned)(SeverityModes severity, const char *message, uint integer);
     void (*PrintInteger)(SeverityModes severity, const char *message, int integer);
     void (*PrintFloat)(SeverityModes severity, const char *message, float f);
     void (*PrintVector2)(SeverityModes severity, const char *message, int x, int y);
     void (*PrintHitbox)(SeverityModes severity, const char *message, Hitbox *hitbox);
 #endif
-    void (*Unknown105)(void);
-    void (*Unknown106)(void);
+    void (*SetActiveVariable)(int objectID, const char *name);
+    void (*AddVarEnumValue)(const char *name);
 #if RETRO_USE_PLUS
     void (*ClearDebugValues)(void);
     void (*SetDebugValue)(const char *name, void *valPtr, int type, int unknown1, int unknown2);
-#else
+#endif
+#if !RETRO_USE_PLUS
     void (*PrintMessage)(void *message, byte type);
 #endif
 } RSDKFunctionTable;
@@ -1052,7 +840,7 @@ typedef struct {
 // =======================================
 // Game Options & RSDKConfig stuff
 // =======================================
-enum GameModes {
+typedef enum {
 #if !RETRO_USE_PLUS
     MODE_NOSAVE,
 #endif
@@ -1062,12 +850,12 @@ enum GameModes {
 #endif
     MODE_TIMEATTACK,
     MODE_COMPETITION,
-};
+} GameModes;
 
-enum CategoryIDS { MEDIA_DEMO };
+typedef enum { MEDIA_DEMO } CategoryIDS;
 
-enum PlayerIDs {
-    MAX_PLAYERS = 4,
+typedef enum {
+    ID_NONE     = 0x00,
     ID_SONIC    = 0x01,
     ID_TAILS    = 0x02,
     ID_KNUCKLES = 0x04,
@@ -1075,69 +863,175 @@ enum PlayerIDs {
     ID_MIGHTY = 0x08,
     ID_RAY    = 0x10,
 #endif
-    ID_TAILS_ASSIST   = ID_TAILS << 8,
+    ID_TAILS_ASSIST   = 0x200,
     ID_DEFAULT_PLAYER = ID_SONIC | ID_TAILS_ASSIST,
-};
+} PlayerIDs;
 
-enum ItemModes { ITEMS_FIXED, ITEMS_RANDOM, ITEMS_TELEPORT };
+typedef enum { ITEMS_FIXED, ITEMS_RANDOM, ITEMS_TELEPORT } ItemModes;
 
-enum MedalMods { MEDAL_DEBUGMODE, MEDAL_ANDKNUCKLES, MEDAL_PEELOUT, MEDAL_INSTASHIELD, MEDAL_DROPDASH, MEDAL_NOTIMEOVER };
+typedef enum { MEDAL_DEBUGMODE, MEDAL_ANDKNUCKLES, MEDAL_PEELOUT, MEDAL_INSTASHIELD, MEDAL_DROPDASH, MEDAL_NOTIMEOVER } MedalMods;
 #define getMod(medal) (1 << medal)
 
-enum ScreenSplit { FORCE_SPLIT = 2 };
+typedef enum { FORCE_SPLIT = 2 } ScreenSplit;
 
-enum ScreenSizes { WIDE_SCR_XSIZE = 424, WIDE_SCR_XCENTER = 212 };
+typedef enum { WIDE_SCR_XSIZE = 424, WIDE_SCR_XCENTER = 212 } ScreenSizes;
 
-enum SaveSlots { NO_SAVE_SLOT = 255 };
+typedef enum { NO_SAVE_SLOT = 255 } SaveSlots;
 
 #if RETRO_USE_PLUS
-enum ModeFilters { FILTER_MANIA = 2, FILTER_ENCORE = 4 };
+typedef enum { FILTER_MANIA = 2, FILTER_ENCORE = 4 } ModeFilters;
+typedef enum { SCN_FILTER_MANIA = 3, SCN_FILTER_ENCORE = 5 } SceneFilters;
 #endif
 
-enum ReservedEntities {
-    SLOT_PLAYER1        = 0,
-    SLOT_PLAYER2        = 1,
-    SLOT_PLAYER3        = 2,
-    SLOT_PLAYER4        = 3,
-    SLOT_MUSIC          = 9,
-    SLOT_BSS_MESSAGE    = 11,
-    SLOT_ZONE           = 12,
-    SLOT_CUTSCENESEQ    = 15,
-    SLOT_PAUSEMENU      = 16,
-    SLOT_DIALOG         = 21,
-    SLOT_REPLAYRECORDER = 37,
-    SLOT_CAMERA1        = 60,
-    SLOT_CAMERA2        = 61,
-    SLOT_CAMERA3        = 62,
-    SLOT_CAMERA4        = 63,
-};
+typedef enum {
+    SLOT_PLAYER1          = 0,
+    SLOT_PLAYER2          = 1,
+    SLOT_PLAYER3          = 2,
+    SLOT_PLAYER4          = 3,
+    SLOT_BSS_SETUP        = 8,
+    SLOT_PBL_SETUP        = 8,
+    SLOT_UFO_SETUP        = 8,
+    SLOT_MUSIC            = 9,
+    SLOT_BSS_HUD          = 10,
+    SLOT_UFO_CAMERA       = 10,
+    SLOT_PBL_CAMERA       = 10,
+    SLOT_BSS_MESSAGE      = 11,
+    SLOT_UFO_HUD          = 11,
+    SLOT_ZONE             = 12,
+    SLOT_CUTSCENESEQ      = 15,
+    SLOT_PAUSEMENU        = 16,
+    SLOT_GAMEOVER         = 16,
+    SLOT_ACTCLEAR         = 16,
+    SLOT_UICONTROL        = 17,
+    SLOT_DIALOG           = 21,
+    SLOT_DIALOG_UICONTROL = 22,
+    SLOT_BSS_HORIZON      = 32,
+    SLOT_UFO_SPEEDLINES   = 34,
+    SLOT_UFO_PLASMA       = 36,
+    SLOT_REPLAYRECORDER   = 37,
+    SLOT_CAMERA1          = 60,
+    SLOT_CAMERA2          = 61,
+    SLOT_CAMERA3          = 62,
+    SLOT_CAMERA4          = 63,
+} ReservedEntities;
 
-enum SettingsValues {
-    SETTINGS_WINDOWED        = 0x0,
-    SETTINGS_BORDERED        = 0x1,
-    SETTINGS_EXCLUSIVEFS     = 0x2,
-    SETTINGS_VSYNC           = 0x3,
-    SETTINGS_TRIPLEBUFFERED  = 0x4,
-    SETTINGS_WINDOW_WIDTH    = 0x5,
-    SETTINGS_WINDOW_HEIGHT   = 0x6,
-    SETTINGS_FSWIDTH         = 0x7,
-    SETTINGS_FSHEIGHT        = 0x8,
-    SETTINGS_REFRESHRATE     = 0x9,
-    SETTINGS_SHADERSUPPORT   = 0xA,
-    SETTINGS_SHADERID        = 0xB,
-    SETTINGS_C               = 0xC,
-    SETTINGS_DIMTIMER        = 0xD,
-    SETTINGS_STREAMSENABLED  = 0xE,
-    SETTINGS_STREAM_VOL      = 0xF,
-    SETTINGS_SFX_VOL         = 0x10,
-    SETTINGS_LANGUAGE        = 0x11,
-    SETTINGS_12              = 0x12,
-    SETTINGS_13              = 0x13,
-    SETTINGS_14              = 0x14,
-    SETTINGS_SETTINGSCHANGED = 0x15,
-    SETTINGS_WRITE           = 0x16,
-};
+typedef enum {
+    CS_Unknown0,
+    CS_Unknown1,
+    CS_Unknown2,
+    CS_Unknown3,
+    CS_Unknown4,
+    CS_Unknown5,
+    CS_Unknown6,
+    CS_Unknown7,
+    CS_Unknown8,
+    CS_Unknown9,
+    CS_Unknown10,
+    CS_Unknown11,
+    CS_Unknown12,
+    CS_Unknown13,
+    CS_Unknown14,
+    CS_Unknown15,
+    CS_Unknown16,
+    CS_Unknown17,
+    CS_Unknown18,
+    CS_Unknown19,
+    CS_Unknown20,
+    CS_Unknown21,
+    CS_inMatch,
+    CS_PlayerCount,
+    CS_LevelIndex,
+    CS_ZoneID,
+    CS_ActID,
+    CS_MatchID,
+    CS_MatchCount,
+    CS_MonitorMode,
+    CS_Unknown29,
+    // flags for each zone
+    CS_ZoneUnknown30, // GHZ
+    CS_ZoneUnknown31, // CPZ
+    CS_ZoneUnknown32, // SPZ
+    CS_ZoneUnknown33, // FBZ
+    CS_ZoneUnknown34, // PGZ
+    CS_ZoneUnknown35, // SSZ
+    CS_ZoneUnknown36, // HCZ
+    CS_ZoneUnknown37, // MSZ
+    CS_ZoneUnknown38, // OOZ
+    CS_ZoneUnknown39, // LRZ
+    CS_ZoneUnknown40, // MMZ
+    CS_ZoneUnknown41, // TMZ
+    CS_CharacterFlags,
+    CS_WinnerFlag1,
+    CS_WinnerFlag2,
+    CS_WinnerFlag3,
+    CS_RingsP1,
+    CS_RingsP2,
+    CS_RingsP3,
+    CS_RingsP4,
+    CS_ScoreP1,
+    CS_ScoreP2,
+    CS_ScoreP3,
+    CS_ScoreP4,
+    CS_ItemsP1,
+    CS_ItemsP2,
+    CS_ItemsP3,
+    CS_ItemsP4,
+    CS_TimeMinutesP1,
+    CS_TimeSecondsP1,
+    CS_TimeMillisecondsP1,
+    CS_TimeMinutesP2,
+    CS_TimeSecondsP2,
+    CS_TimeMillisecondsP2,
+    CS_TimeMinutesP3,
+    CS_TimeSecondsP3,
+    CS_TimeMillisecondsP3,
+    CS_TimeMinutesP4,
+    CS_TimeSecondsP4,
+    CS_TimeMillisecondsP4,
+    CS_FinishFlags,
+    CS_TotalRingsP1,
+    CS_TotalRingsP2,
+    CS_TotalRingsP3,
+    CS_TotalRingsP4,
+    CS_WinsP1,
+    CS_WinsP2,
+    CS_WinsP3,
+    CS_WinsP4,
+    CS_LivesP1,
+    CS_LivesP2,
+    CS_LivesP3,
+    CS_LivesP4,
+    CS_Unknown84,
+    CS_Unknown85,
+    CS_Unknown86,
+    CS_Unknown87,
+    CS_ReadOnlyDisplayMode,
+    CS_Unknown89,
+    CS_Unknown90,
+    CS_Unknown91,
+    CS_Unknown92,
+    CS_Unknown93,
+    CS_Unknown94,
+    CS_Unknown95,
+    CS_Unknown96,
+    CS_Unknown97,
+    CS_Unknown98,
+    CS_Unknown99,
+} CompetitionSessionIDs;
 
+typedef enum {
+    PRESENCE_GENERIC,
+    PRESENCE_MENU,
+    PRESENCE_MANIA,
+#if RETRO_USE_PLUS
+    PRESENCE_ENCORE,
+#endif
+    PRESENCE_TA,
+    PRESENCE_COMP,
+    PRESENCE_TITLE,
+} PresenceTypes;
+
+//this is just mania's default, this can be changed/removed with correct gameconfig edits
 typedef struct {
     int gameMode;
     int playerID;
@@ -1207,7 +1101,7 @@ typedef struct {
     int lastHasPlus;
     int hasPlusInitial;
 #endif
-} GameOptions;
+} GlobalVariables;
 
 typedef struct {
     const char *name;
@@ -1219,47 +1113,19 @@ typedef struct {
 // =======================================
 extern Hitbox defaultHitbox;
 
-extern GameObject objectList[0x400];
-extern int objectListCount;
+extern Object *(*GetObject)(const char *name);
 
-void (*CreateObject_Ptr)(Object **structPtr, const char *name, uint entitySize, uint objectSize, void (*update)(), void (*lateUpdate)(),
-                     void (*staticUpdate)(), void (*draw)(), void (*create)(void *), void (*stageLoad)(), void (*editorDraw)(), void (*editorLoad)(),
-                     void (*serialize)());
-inline void CreateObject_Private(Object **structPtr, const char *name, uint entitySize, uint objectSize, void (*update)(), void (*lateUpdate)(),
-                     void (*staticUpdate)(), void (*draw)(), void (*create)(void *), void (*stageLoad)(), void (*editorDraw)(), void (*editorLoad)(), void (*serialize)())
-{
-    objectList[objectListCount].name = name;
-    objectList[objectListCount].structPtr = structPtr;
-    if (CreateObject_Ptr)
-        CreateObject_Ptr(structPtr, name, entitySize, objectSize, update, lateUpdate, staticUpdate, draw, create, stageLoad, editorDraw, editorLoad,
-                         serialize);
-    objectListCount++;
-}
+extern GlobalVariables *globals;
 
-inline Object *GetObject(const char *name)
-{
-    for (int i = 0; i < objectListCount; ++i) {
-        if (objectList[i].structPtr && *objectList[i].structPtr) {
-            if (strcmp(name, objectList[i].name) == 0)
-                return *objectList[i].structPtr;
-        }
-    }
-    return NULL;
-}
-
-extern GameOptions *options;
-
+extern RSDKFunctionTable RSDK;
 #if RETRO_USE_PLUS
 extern UserFunctionTable User;
 #endif
-extern RSDKFunctionTable RSDK;
 
 extern SceneInfo *RSDK_sceneInfo;
-#if RETRO_USE_PLUS
-extern char *RSDK_name;
-extern SKUInfo *RSDK_sku;
-#elif !RETRO_USE_PLUS
 extern EngineInfo *RSDK_info;
+#if RETRO_USE_PLUS
+extern SKUInfo *RSDK_sku;
 #endif
 extern ControllerState *RSDK_controller;
 extern AnalogState *RSDK_stickL;

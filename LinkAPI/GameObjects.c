@@ -1,11 +1,9 @@
 #include "LinkAPI.h"
 
 SceneInfo *RSDK_sceneInfo = NULL;
-#if RETRO_USE_PLUS
-char *RSDK_name   = NULL;
-SKUInfo *RSDK_sku = NULL;
-#else
 EngineInfo *RSDK_info;
+#if RETRO_USE_PLUS
+SKUInfo *RSDK_sku = NULL;
 #endif
 ControllerState *RSDK_controller = NULL;
 AnalogState *RSDK_stickL         = NULL;
@@ -20,23 +18,24 @@ UnknownInfo *RSDK_unknown = NULL;
 #endif
 ScreenInfo *RSDK_screens = NULL;
 
-char textBuffer[0x400];
-
+RSDKFunctionTable RSDK;
 #if RETRO_USE_PLUS
 UserFunctionTable User;
 #endif
-RSDKFunctionTable RSDK;
 
 Hitbox defaultHitbox;
 
-GameObject objectList[0x400];
-int objectListCount = 0;
+Object *(*GetObject)(const char *name) = NULL;
 
-GameOptions *options;
+GlobalVariables *globals = NULL;
 
 // This manages RSDKv5/Mania link, so it doesn't need to be edited
-void InitLinkAPI(GameInfo *info)
+void InitLinkAPI(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject))
 {
+    globals = NULL;
+    if (initAPI)
+        initAPI((void **)&globals, sizeof(GlobalVariables), (void **)&GetObject);
+
 #if RETRO_USE_PLUS
     memset(&User, 0, sizeof(UserFunctionTable));
 #endif
@@ -49,13 +48,9 @@ void InitLinkAPI(GameInfo *info)
         memcpy(&User, info->userdataPtrs, sizeof(UserFunctionTable));
 #endif
 
-#if RETRO_USE_PLUS
-    RSDK_name = info->gameName;
-    RSDK_sku  = info->currentSKU;
-#endif
-
-#if !RETRO_USE_PLUS
     RSDK_info = info->engineInfo;
+#if RETRO_USE_PLUS
+    RSDK_sku = info->currentSKU;
 #endif
     RSDK_sceneInfo  = info->sceneInfo;
     RSDK_controller = info->controller;
@@ -70,30 +65,24 @@ void InitLinkAPI(GameInfo *info)
     RSDK_unknown = info->unknown;
 #endif
     RSDK_screens = info->screenInfo;
-    RSDK.InitGameOptions((void **)&options, sizeof(GameOptions));
 
     defaultHitbox.left   = -10;
     defaultHitbox.top    = -20;
     defaultHitbox.right  = 10;
     defaultHitbox.bottom = 20;
-
-    memset(objectList, 0, 0x400 * sizeof(GameObject));
-    objectListCount = 0;
-
-    //store this pointer for use later
-    CreateObject_Ptr  = RSDK.CreateObject;
-    //redirect all objects to forcefully use our pointer instead
-    RSDK.CreateObject = CreateObject_Private;
 }
+
+#include <stdio.h>
+#include <stdlib.h>
 
 // ================
 // OBJECTS
 // ================
 #include "Example.h"
 
-DLLExport void LinkGameLogicDLL(GameInfo *info)
+DLLExport void LinkGameLogicDLL(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject))
 {
-    InitLinkAPI(info);
+    InitLinkAPI(info, initAPI);
 
     // Object Adding Example
     RSDK_ADD_OBJECT(Example); //feel free to remove this, its just for an example
