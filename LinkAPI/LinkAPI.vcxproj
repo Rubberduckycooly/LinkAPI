@@ -159,12 +159,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Objects\Example.c" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Example.c" />
     <ClCompile Include="GameObjects.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Example.h" />
+    <ClInclude Include="..\Objects\Example.h" />
     <ClInclude Include="GameLink.h" />
     <ClInclude Include="LinkAPI.h" />
   </ItemGroup>

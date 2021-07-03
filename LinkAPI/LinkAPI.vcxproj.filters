@@ -12,27 +12,30 @@
     <Filter Include="Source Files\Objects">
       <UniqueIdentifier>{31188e46-b00a-4fe9-8d42-0f4eaec042ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\LinkAPI">
+      <UniqueIdentifier>{58417589-4eff-49a1-99c0-2a0b1215dbd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Example.c">
+    <ClCompile Include="..\Objects\Example.c">
       <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\LinkAPI</Filter>
     </ClCompile>
     <ClCompile Include="GameObjects.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\LinkAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameLink.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="..\Objects\Example.h">
+      <Filter>Source Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="LinkAPI.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\LinkAPI</Filter>
     </ClInclude>
-    <ClInclude Include="Example.h">
-      <Filter>Source Files\Objects</Filter>
+    <ClInclude Include="GameLink.h">
+      <Filter>Source Files\LinkAPI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
