@@ -2,8 +2,6 @@
 
 ObjectExample *Example = NULL;
 
-//RSDK_REGISTER_OBJECT(Example);
-
 // Run once per frame, once per entity
 void Example_Update(void)
 {
@@ -30,7 +28,7 @@ void Example_Draw(void)
     RSDK_THIS(Example); // gets the current entity, under the name "entity"
 
     // Something like
-    // RSDK.DrawSprite(&entity->data, NULL, true);
+    // RSDK.DrawSprite(&entity->animator, NULL, true);
     // or
     // RSDK.DrawRect(0, 0, 25, 25, 0xFF00FF, 0xFF, INK_NONE, true);
 }

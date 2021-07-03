@@ -1,5 +1,8 @@
 #include "LinkAPI.h"
 
+// ================
+// DATA
+// ================
 SceneInfo *RSDK_sceneInfo = NULL;
 EngineInfo *RSDK_info;
 #if RETRO_USE_PLUS
@@ -29,12 +32,19 @@ Object *(*GetObject)(const char *name) = NULL;
 
 GlobalVariables *globals = NULL;
 
+int RSDK_GameVersion = 0;
+
+// ================
+// INTERNALS
+// ================
+void LinkGameObjects(void);
+
 // This manages RSDKv5/Mania link, so it doesn't need to be edited
-void InitLinkAPI(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject))
+void InitLinkAPI(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject, int *gameVersion))
 {
     globals = NULL;
     if (initAPI)
-        initAPI((void **)&globals, sizeof(GlobalVariables), (void **)&GetObject);
+        initAPI((void **)&globals, sizeof(GlobalVariables), (void **)&GetObject, &RSDK_GameVersion);
 
 #if RETRO_USE_PLUS
     memset(&User, 0, sizeof(UserFunctionTable));
@@ -72,22 +82,29 @@ void InitLinkAPI(GameInfo *info, void (*initAPI)(void **globals, int size, void 
     defaultHitbox.bottom = 20;
 }
 
+DLLExport void LinkGameLogicDLL(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject, int *gameVersion))
+{
+    InitLinkAPI(info, initAPI); // init mania and linkAPI internals
+    LinkGameObjects();          // init custom objects
+}
+
 #include <stdio.h>
-#include <stdlib.h>
 
 // ================
 // OBJECTS
 // ================
 #include "Example.h"
 
-DLLExport void LinkGameLogicDLL(GameInfo *info, void (*initAPI)(void **globals, int size, void **getObject))
+void LinkGameObjects(void)
 {
-    InitLinkAPI(info, initAPI);
-
     // Object Adding Example
-    RSDK_ADD_OBJECT(Example); //feel free to remove this, its just for an example
-    //Add other objects here
+    RSDK_ADD_OBJECT(Example); // feel free to remove this, its just for an example
+    // Add other objects here, just like shown above
 }
+
+// ================
+// MOD INFO STUFF
+// ================
 
 // Generally, this can be ignored
 typedef struct {
@@ -96,5 +113,5 @@ typedef struct {
 } ModInfo;
 
 // mod loader ver is always 1
-// if we're using plus we're on 1.05/1.06, we're on 1.03
-DLLExport ModInfo ManiaModInfo = { 1, RETRO_USE_PLUS ? 5 : 3 };
+// if we're using plus we're on 1.05/1.06, we're on 1.03, if we're using EGS/Origin we're on 1.07
+DLLExport ModInfo ManiaModInfo = { 1, RETRO_USE_EGS ? 7 : (RETRO_USE_PLUS ? 5 : 3) };

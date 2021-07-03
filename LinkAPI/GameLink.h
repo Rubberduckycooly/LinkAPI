@@ -518,6 +518,13 @@ typedef enum {
 typedef enum { STATUS_CONTINUE = 100, STATUS_OK = 200, STATUS_FORBIDDEN = 403, STATUS_NOTFOUND = 404, STATUS_ERROR = 500 } StatusCodes;
 
 typedef enum {
+    VER_CONSOLE_LAUNCH = 1,
+    VER_PRE_PLUS       = 3,
+    VER_PLUS           = 5,
+    VER_EGS            = 7,
+} GameVersions;
+
+typedef enum {
     REGION_US,
     REGION_JP,
     REGION_EU,
@@ -558,6 +565,7 @@ typedef enum {
 // RSDK Function Tables
 // =======================================
 
+#if RETRO_USE_PLUS
 // Userdata Table
 typedef struct {
     int (*GetUserLanguage)(void);
@@ -567,10 +575,23 @@ typedef struct {
     void (*Unknown4)(byte inputID);
     bool32 (*CheckDLC)(int dlc);
     void (*ShowExtensionOverlay)(byte overlay);
+#if RETRO_USE_EGS
+    void (*EGS_Checkout)(int a1);
+    void (*EGS_ShowEncorePage)(int a1);
+    void (*EGS_Unknown4)(int a1);
+    void (*EGS_RegisterHIDDevice)(void);
+#endif
     void (*UnlockAchievement)(const char *achName);
     void (*GetAchievementStatus)(void);
     void (*SetAchievementStatus)(int a1);
+#if RETRO_USE_EGS
+    void (*EGS_AchievementsUnknown1)(void);
+    void (*EGS_AchievementsUnknown2)(int a1, int a2);
+#endif
     void (*LeaderboardsUnknown4)(void);
+#if RETRO_USE_EGS
+    void (*EGS_LeaderboardUnknown1)(void);
+#endif
     void (*FetchLeaderboard)(int a1, int a2);
     void (*TrackScore)(int a1, int a2, int a3);
     void (*GetLeaderboardsUnknown)(void);
@@ -621,6 +642,7 @@ typedef struct {
     void (*RemoveAllDBEntries)(ushort tableID);
     // count: 59
 } UserFunctionTable;
+#endif
 
 // Function Table
 typedef struct {
@@ -640,8 +662,8 @@ typedef struct {
     int (*GetEntityCount)(ushort type, bool32 isActive);
     int (*GetDrawListRef)(byte layerID, ushort entityID);
     void *(*GetDrawListRefPtr)(byte layerID, ushort entityID);
-    int (*ResetEntityPtr)(void *entity, ushort type, void *data);
-    int (*ResetEntitySlot)(ushort slotID, ushort type, void *data);
+    void (*ResetEntityPtr)(void *entity, ushort type, void *data);
+    void (*ResetEntitySlot)(ushort slotID, ushort type, void *data);
     Entity *(*CreateEntity)(ushort type, void *data, int x, int y);
     void (*CopyEntity)(void *destEntity, void *srcEntity, bool32 clearSrcEntity);
     bool32 (*CheckOnScreen)(void *entity, Vector2 *range);
@@ -697,13 +719,13 @@ typedef struct {
     void (*MatrixCopy)(Matrix *matDest, Matrix *matSrc);
     void (*SetText)(TextInfo *textInfo, const char *text, uint size);
     void (*CopyString)(TextInfo *dst, TextInfo *src);
-    void (*PrependString)(TextInfo *info, const char *str);
-    void (*AppendString)(TextInfo *info, const char *str);
-    void (*Unknown67)(TextInfo *, TextInfo *);
+    void (*PrependText)(TextInfo *info, const char *text);
+    void (*AppendString)(TextInfo *info, TextInfo *str);
+    void (*AppendText)(TextInfo *info, const char *text);
     void (*LoadStrings)(TextInfo *dst, const char *path, int);
     void (*SplitStringList)(TextInfo *list, TextInfo *strings, int start, int end);
     void (*GetCString)(char *text, TextInfo *info);
-    void (*StringCompare)(TextInfo *strA, TextInfo *strB, bool32 flag);
+    bool32 (*StringCompare)(TextInfo *strA, TextInfo *strB, bool32 flag);
     void (*GetDisplayInfo)(int *displayID, int *width, int *height, int *refreshRate, TextInfo *text);
     void (*GetWindowSize)(int *width, int *height);
     int (*SetScreenSize)(byte screenID, ushort width, ushort height);
@@ -743,9 +765,9 @@ typedef struct {
     ushort (*LoadMesh)(const char *filename, byte scope);
     ushort (*Create3DScene)(const char *identifier, ushort faceCount, byte scope);
     void (*Prepare3DScene)(ushort index);
-    void (*SetAmbientColour)(ushort index, int x, int y, int z);
     void (*SetDiffuseColour)(ushort index, int x, int y, int z);
-    void (*SetSpecularColour)(ushort index, int x, int y, int z);
+    void (*SetDiffuseIntensity)(ushort index, int x, int y, int z);
+    void (*SetSpecularIntensity)(ushort index, int x, int y, int z);
     void (*AddModelTo3DScene)(ushort modelIndex, ushort sceneIndex, byte type, Matrix *mat1, Matrix *mat2, colour colour);
     void (*SetModelAnimation)(ushort modelAnim, Animator *data, short animSpeed, byte loopIndex, bool32 forceApply, ushort frameID);
     void (*AddMeshFrameTo3DScene)(ushort modelID, ushort sceneID, Animator *data, byte drawMode, Matrix *mat1, Matrix *mat, colour colour);
@@ -762,8 +784,8 @@ typedef struct {
     short (*GetFrameID)(Animator *data);
     int (*GetStringWidth)(ushort sprIndex, ushort animID, TextInfo *info, int startIndex, int length, int spacing);
     void (*ProcessAnimation)(Animator *data);
-    TileLayer *(*GetSceneLayer)(int layerID);
     int (*GetSceneLayerID)(const char *name);
+    TileLayer *(*GetSceneLayer)(int layerID);
     void (*GetLayerSize)(ushort layer, Vector2 *size, bool32 pixelSize);
     ushort (*GetTileInfo)(ushort layer, int x, int y);
     void (*SetTileInfo)(ushort layer, int x, int y, ushort tile);
@@ -787,7 +809,7 @@ typedef struct {
     int (*PlaySFX)(ushort sfx, int loop, int pan);
     void (*StopSFX)(ushort sfx);
     int (*PlayStream)(const char *filename, uint slot, int a3, uint loopPoint, bool32 loadASync);
-    int (*SetChannelAttributes)(byte slot, float volume, float pan, float playbackSpeed);
+    int (*SetChannelAttributes)(byte slot, float volume, float pan, float speed);
     void (*StopChannel)(byte slot);
     void (*PauseChannel)(byte slot);
     void (*ResumeChannel)(byte slot);
@@ -797,18 +819,18 @@ typedef struct {
     void (*LoadVideo)(const char *filename, double a2, bool32 (*skipCallback)(void));
     bool32 (*LoadImage)(const char *filename, double displayLength, double speed, bool32 (*skipCallback)(void));
 #if RETRO_USE_PLUS
-    int (*ControllerIDForInputID)(byte controllerID);
-    int (*MostRecentActiveControllerID)(int inputID, int a2, uint a3);
-    int (*Unknown100)(int inputID);
+    int (*ControllerIDForInputID)(byte inputID);
+    int (*MostRecentActiveControllerID)(int deviceID, int a2, uint a3);
+    int (*GetControllerType)(int inputID);
     int (*GetAssignedControllerID)(int inputID);
     int (*GetAssignedUnknown)(int inputID);
     int (*DoInputUnknown2)(int inputID, int a2, int a3);
     int (*DoInputUnknown3)(int inputID, int a2, int a3);
     int (*Missing24)(void);
-    int (*DoInputUnknown2_Active)(byte controllerID, int a2, int a3);
-    int (*DoInputUnknown3_Active)(byte controllerID, int a2, int a3);
-    void (*AssignControllerID)(byte controllerID, int a2);
-    bool32 (*InputIDIsDisconnected)(byte controllerID);
+    int (*DoInputUnknown2_Active)(byte inputID, int a2, int a3);
+    int (*DoInputUnknown3_Active)(byte inputID, int a2, int a3);
+    void (*AssignControllerID)(byte inputID, int deviceID);
+    bool32 (*InputIDIsDisconnected)(byte inputID);
     void (*ResetControllerAssignments)(void);
 #endif
 #if !RETRO_USE_PLUS
@@ -1139,5 +1161,7 @@ extern TouchMouseData *RSDK_touchMouse;
 extern UnknownInfo *RSDK_unknown;
 #endif
 extern ScreenInfo *RSDK_screens;
+
+extern int RSDK_GameVersion;
 
 #endif /* GAMELINK_H */

@@ -5,6 +5,10 @@
 // ignore this if you dont know what you're doing
 #define RETRO_USE_PLUS (1)
 
+// set to this 1 to use 1.07/EGS/origin, set it to 0 to use 1.06 or below (default)
+// ignore this if you dont know what you're doing
+#define RETRO_USE_EGS  (0)
+
 #define true 1
 #define false 0
 
@@ -26,13 +30,11 @@
 #define RSDK_ADD_OBJECT_CONTAINER(object) RSDK.RegisterObjectContainer((Object **)&object, #object, sizeof(Object##object))
 #endif
 
-#define RSDK_REGISTER_OBJECT(object)                                                                                                                      \
-    RSDK.RegisterObject((Object **)&object, #object, sizeof(Entity##object), sizeof(Object##object), ##object##_Update, ##object##_LateUpdate,         \
-                      ##object##_StaticUpdate, ##object##_Draw, ##object##_Create, ##object##_StageLoad, ##object##_EditorDraw,                      \
-                      ##object##_EditorLoad, ##object##_Serialize)
 
 #define RSDK_THIS(type)             Entity##type *entity = (Entity##type *)RSDK_sceneInfo->entity
 #define RSDK_GET_ENTITY(slot, type) ((Entity##type *)RSDK.GetEntityByID(slot))
+
+//#define RSDK_REGISTER_OBJECT(object) 
 
 #define foreach_active(type, entityOut)                                                                                                              \
     Entity##type *entityOut = NULL;                                                                                                                  \
@@ -53,8 +55,9 @@
 
 #define StateMachine(name) void (*name)(void)
 #define StateMachine_Run(func)                                                                                                                       \
-    if (func)                                                                                                                                        \
-        func();
+    if (func) {                                                                                                                                      \
+        func();                                                                                                                                      \
+    }
 #define StateMachine_None NULL
 
 #endif // !LINKAPI_H
